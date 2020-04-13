@@ -1,4 +1,4 @@
-#include "WebApiHandler.hpp"
+#include "WeatherApiHandler.hpp"
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 #include <utility>
@@ -31,19 +31,19 @@ pplx::task<json::value> fetchDataImpl(const std::string& requestUri, const std::
 namespace backend
 {
 
-WebApiHandler::WebApiHandler(std::string&& clientUrl, std::string&& requestUriPrefix)
+WeatherApiHandler::WeatherApiHandler(std::string&& clientUrl, std::string&& requestUriPrefix)
 : clientUrl_(std::move(clientUrl))
 , requestUriPrefix_(std::move(requestUriPrefix))
 {
 
 }
 
-void WebApiHandler::setApiKey(const std::string& apiKey)
+void WeatherApiHandler::setApiKey(const std::string& apiKey)
 {
 	apiKey_ = apiKey;
 }
 
-pplx::task<json::value> WebApiHandler::fetchData(const std::string& zipCode, const std::string& countryCode)
+WeatherApiResponseData* WeatherApiHandler::fetchData(const std::string& zipCode, const std::string& countryCode)
 {
 	//todo: create query builder
 	std::string query {"/"};
@@ -55,21 +55,19 @@ pplx::task<json::value> WebApiHandler::fetchData(const std::string& zipCode, con
 	query.append("&appid=");
 	query.append(apiKey_.c_str());
 
-    std::cout << "query: " << query << std::endl;
-
-    return fetchDataImpl(query, clientUrl_);
+    auto json = fetchDataImpl(query, clientUrl_).get();
+    return new WeatherApiResponseData(json);
 }
 
-pplx::task<json::value> WebApiHandler::fetchData(const GPSCoordinates& coords)
+WeatherApiResponseData* WeatherApiHandler::fetchData(const GPSCoordinates& coords)
 {
     uri_builder builder(U(requestUriPrefix_));
     builder.append_query(U("lat"), U(std::to_string(coords.latitude_).c_str()));
     builder.append_query(U("&lon"), U(std::to_string(coords.longitude_).c_str()), false);
     builder.append_query(U("&appid"), U(apiKey_.c_str()), false);
 
-    std::cout << "query: " << builder.to_string() << std::endl;
-
-	return fetchDataImpl(builder.to_string(), clientUrl_);
+	auto json = fetchDataImpl(builder.to_string(), clientUrl_).get();
+	return new WeatherApiResponseData(json);
 }
 
 }
