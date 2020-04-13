@@ -94,13 +94,24 @@ ApplicationWindow {
 							if(!OpenWeatherMapApi.isUriValid())
 							{
 								json_text.updateText("Please provide valid country code and zip code.")
+								zip_code.text = ""
+								country_code.text = ""
 							}
 							else
 							{
 								var responseStatus = OpenWeatherMapApi.responseStatusCode()
-								if(responseStatus != 200)
+								if(responseStatus != 200) //use type from backend rather than ints
 								{
 									json_text.updateText(OpenWeatherMapApi.responseStatusInfo())
+									if(responseStatus == 401)
+									{
+										api_key.text = ""
+									}
+									if(responseStatus == 404)
+									{
+										zip_code.text = ""
+										country_code.text = ""
+									}
 								}
 								else
 								{
