@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(qt-quick-weather-app)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -23,10 +26,15 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 set(SOURCE 
 	${SOURCE}
 	src/main.cpp
-	src/backend/WebApiHandler.hpp
-	src/backend/WebApiHandler.cpp
-	src/qtquick/QWebApiHandler.hpp
-	src/qtquick/QWebApiHandler.cpp
+	src/utils/shared_enums/TemperatureScale.hpp
+	src/utils/shared_enums/TemperatureType.hpp
+	src/backend/WeatherApiHandler.hpp
+	src/backend/WeatherApiHandler.cpp
+	src/backend/WeatherApiResponseData.hpp
+	src/backend/WeatherApiResponseData.cpp
+	src/qtquick/QWeatherApiHandler.hpp
+	src/qtquick/QWeatherApiHandler.cpp
+	src/3party/HttpStatusCodes_C++11.h
 )
 
 add_executable(qt-quick-weather-app ${SOURCE} ${qml_QRC})
