@@ -4,11 +4,16 @@ import QtQuick.Controls 2.14
 import QtQml 2.14
 import QtQuick.Layouts 1.14
 import QtQml.Models 2.14
-import Qt.WebApiHandler 1.0
+import Qt.WeatherApiHandler 1.0
+import SharedEnums.TemperatureType 1.0
+import SharedEnums.TemperatureScale 1.0
 
 Window {
 	id: main_window
 	visible: true
+	minimumWidth: grid_main.width + json_text.width
+	minimumHeight: grid_main.height + json_text.height
+
 	MouseArea {
 		anchors.fill: parent
 
@@ -48,7 +53,9 @@ Window {
 					onClicked: {
 						OpenWeatherMapApi.setApiKey(api_key.text)
 						OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
-						json_text.updateText(OpenWeatherMapApi.getLastFetchedData())
+						json_text.updateText(OpenWeatherMapApi.cityName(true) + " " 
+							+ OpenWeatherMapApi.temperature(TemperatureType.Average, 
+								TemperatureScale.Celsius))
 					}
 				}
 			}
@@ -57,7 +64,6 @@ Window {
 				text: "sth"
 				function updateText(txt)
 				{
-					console.log("txt is", txt)
 					json_text.text = txt
 				}
 			}
