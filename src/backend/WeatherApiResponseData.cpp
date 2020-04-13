@@ -18,7 +18,7 @@ std::string responseStatusUserFeedback(HttpStatus::Code code)
 	case HttpStatus::Code::Unauthorized:
 		return "Please provide valid API key.";
 	case HttpStatus::Code::NotFound:
-		return "Please provide valid zip code and country code."
+		return "Please provide valid zip code and country code.";
 	default:
 		return "User feedback: none.";
 	}
