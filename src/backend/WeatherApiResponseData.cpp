@@ -41,7 +41,15 @@ unsigned int WeatherApiResponseData::responseStatusCode()
 
 	try
 	{
-		result = std::stoi(weatherApiResponseBody_["cod"].as_string());
+		if(weatherApiResponseBody_["cod"].is_string())
+		{
+			result = std::stoi(weatherApiResponseBody_["cod"].as_string());
+		}
+
+		if(weatherApiResponseBody_["cod"].is_integer())
+		{
+			result = weatherApiResponseBody_["cod"].as_integer();
+		}
 	}
 	catch(const web::json::json_exception& e)
 	{
