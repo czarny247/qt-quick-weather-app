@@ -13,6 +13,14 @@
 namespace qtquick
 {
 
+QWeatherApiHandler::QWeatherApiHandler(std::shared_ptr<backend::WeatherApiHandler> weatherApiHandler)
+: weatherApiHandler_(weatherApiHandler)
+{
+	weatherApiHandler_->setFetchDataFinishedCallback(
+		std::bind(&QWeatherApiHandler::fetchDataFinishedCallback, this));
+}
+
+
 Q_INVOKABLE void QWeatherApiHandler::setApiKey(const QString& apiKey)
 {
 	weatherApiHandler_->setApiKey(apiKey.toStdString());
@@ -53,6 +61,16 @@ QString QWeatherApiHandler::temperature(TemperatureType type, TemperatureScale s
 	assert(data_ != nullptr);
 	return QString::fromStdString(data_->temperature(type, scale)) 
 		+ temperature_scale::temperatureUnit(scale);
+}
+
+Q_INVOKABLE bool QWeatherApiHandler::isUriValid()
+{
+	return weatherApiHandler_->isUriValid();
+}
+
+void QWeatherApiHandler::fetchDataFinishedCallback()
+{
+	emit fetchDataFinished();
 }
 
 }
