@@ -1,6 +1,6 @@
-#include "backend/WebApiConstants.hpp"
-#include "backend/WebApiHandler.hpp"
-#include "qtquick/QWebApiHandler.hpp"
+#include "backend/WeatherApiConstants.hpp"
+#include "backend/WeatherApiHandler.hpp"
+#include "qtquick/QWeatherApiHandler.hpp"
 #include <cpprest/filestream.h>
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
@@ -8,6 +8,8 @@
 #include <memory>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include "utils/shared_enums/TemperatureType.hpp"
+#include "utils/shared_enums/TemperatureScale.hpp"
 
 using namespace backend;
 using namespace concurrency::streams;
@@ -20,27 +22,31 @@ using namespace web;
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+	QGuiApplication app(argc, argv);
 
-    std::shared_ptr<WebApiHandler> openWeatherMapApi = std::make_shared<WebApiHandler>(
-        std::string(openWeatherMapApiUrl), 
-        std::string(openWeatherMapApiUriPrefix));
+	std::shared_ptr<WeatherApiHandler> openWeatherMapApi = std::make_shared<WeatherApiHandler>(
+		std::string(openWeatherMapApiUrl),
+		std::string(openWeatherMapApiUriPrefix));
 
-    QCoreApplication::addLibraryPath("./");
+	QCoreApplication::addLibraryPath("./");
 
-    QQmlApplicationEngine appEngine;
+	QQmlApplicationEngine appEngine;
 
-    qmlRegisterSingletonType<QWebApiHandler>("Qt.WebApiHandler", 1, 0, "OpenWeatherMapApi", 
-    	[&openWeatherMapApi](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * 
-    	{
-    		Q_UNUSED(engine)
-    		Q_UNUSED(scriptEngine)
+	//move to class - static method
+	qmlRegisterSingletonType<QWeatherApiHandler>("Qt.WeatherApiHandler", 1, 0, "OpenWeatherMapApi",
+		[&openWeatherMapApi](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *
+		{
+			Q_UNUSED(engine)
+			Q_UNUSED(scriptEngine)
 
-    		QWebApiHandler *handler = new QWebApiHandler(openWeatherMapApi);
-    		return handler;
+			QWeatherApiHandler *handler = new QWeatherApiHandler(openWeatherMapApi);
+			return handler;
 		});
 
-    appEngine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+	temperature_type::registerInQml();
+	temperature_scale::registerInQml();
 
-    return app.exec();
+	appEngine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+
+	return app.exec();
 }
