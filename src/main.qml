@@ -14,6 +14,8 @@ ApplicationWindow {
 	visible: true
 	minimumWidth: weather_layout.width + errorUserFeedback.width
 	minimumHeight: weather_layout.height + errorUserFeedback.height + overlayHeader.height
+	width: 800
+	height: 600
 
 	ToolBar {
 		id: overlayHeader
@@ -73,6 +75,7 @@ ApplicationWindow {
 
 	MouseArea {
 		anchors.fill: parent
+		id: main_mouse_area
 
 		RowLayout {
 			anchors.centerIn: parent
@@ -90,6 +93,34 @@ ApplicationWindow {
 					echoMode = TextInput.Password
 				}
 			}
+
+			RoundButton {
+				id: set_api_key_help_button
+				text: "?"
+				onClicked : set_api_key_help_popup.open()
+
+				Popup {
+					id: set_api_key_help_popup
+					x: main_mouse_area.mouseX - parent.width/2
+					y: main_mouse_area.mouseY - parent.height/2
+					modal: true
+					focus: true
+					closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+					contentItem: Text {
+						anchors.centerIn: parent
+						text: "For more info regarding API key, go here: \
+							<a href='https://openweathermap.org/'>https://openweathermap.org/</a>"
+						onLinkActivated: Qt.openUrlExternally(link)
+
+						MouseArea {
+							anchors.fill: parent
+							acceptedButtons: Qt.NoButton
+							cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+						}
+					}
+				}
+			}
+
 			Button {
 				id: set_api_key_button
 				text: "SET"
