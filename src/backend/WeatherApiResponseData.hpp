@@ -22,6 +22,7 @@ public:
 
 	unsigned int responseStatusCode();
 	std::string responseStatusInfo();
+	std::string responseStatusUserFeedback();
 	std::string cityName(bool withCountryCode);
 	std::string temperature(TemperatureType type, TemperatureScale scale);
 

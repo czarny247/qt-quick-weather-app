@@ -10,7 +10,7 @@
 namespace
 {
 
-std::string responseStatusUserFeedback(HttpStatus::Code code)
+std::string userFeedback(HttpStatus::Code code)
 {
 	switch(code)
 	{
@@ -59,14 +59,17 @@ unsigned int WeatherApiResponseData::responseStatusCode()
 	return result;
 }
 
-//handle null jsons
-
 std::string WeatherApiResponseData::responseStatusInfo()
 {
 	int code = responseStatusCode();
 	std::string reasonPhrase = HttpStatus::reasonPhrase(code);
 	return {std::to_string(code) + ": " + reasonPhrase + ". " 
-		+ responseStatusUserFeedback(static_cast<HttpStatus::Code>(code))};
+		+ userFeedback(static_cast<HttpStatus::Code>(code))};
+}
+
+std::string WeatherApiResponseData::responseStatusUserFeedback()
+{
+	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCode()))};
 }
 
 std::string WeatherApiResponseData::cityName(bool withCountryCode)

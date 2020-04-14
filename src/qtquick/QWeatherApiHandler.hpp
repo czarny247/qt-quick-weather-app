@@ -31,6 +31,7 @@ public:
 
 	Q_INVOKABLE int responseStatusCode();
 	Q_INVOKABLE QString responseStatusInfo();
+	Q_INVOKABLE QString responseStatusUserFeedback();
 	Q_INVOKABLE QString cityName(bool withCountryCode);
 	Q_INVOKABLE QString temperature(int temperatureType, int temperatureScale);
 	Q_INVOKABLE bool isUriValid();

@@ -44,6 +44,12 @@ Q_INVOKABLE QString QWeatherApiHandler::responseStatusInfo()
 	return QString::fromStdString(data_->responseStatusInfo());
 }
 
+Q_INVOKABLE QString QWeatherApiHandler::responseStatusUserFeedback()
+{
+	assert(data_ != nullptr);
+	return QString::fromStdString(data_->responseStatusUserFeedback());
+}
+
 Q_INVOKABLE QString QWeatherApiHandler::cityName(bool withCountryCode)
 {
 	assert(data_ != nullptr);
