@@ -203,8 +203,6 @@ ApplicationWindow {
 				}
 			}
 			ColumnLayout {
-				//anchors.centerIn: parent
-				//anchors.verticalCenterOffset: overlayHeader.height
 				id: weather_output_layout
 				visible: false
 				RowLayout {
