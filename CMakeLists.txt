@@ -16,9 +16,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
 endif()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set (CMAKE_PREFIX_PATH /usr/lib/x86_64-linux-gnu/cmake/)
+endif()
+
 find_package(cpprestsdk REQUIRED)
 find_package(Qt5 REQUIRED Qml Quick Gui Core)
-find_package(Qt5QuickCompiler)
+#find_package(Qt5QuickCompiler) seems to be not needed and it is not a part of freeware packages
 qt5_add_resources(qml_QRC src/qml.qrc)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
@@ -38,5 +42,10 @@ set(SOURCE
 )
 
 add_executable(qt-quick-weather-app ${SOURCE} ${qml_QRC})
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	find_package(Boost COMPONENTS system filesystem REQUIRED)
+	target_link_libraries(qt-quick-weather-app PRIVATE ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+endif()
 
 target_link_libraries(qt-quick-weather-app PRIVATE Qt5::Qml Qt5::Quick cpprestsdk::cpprest)
