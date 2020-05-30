@@ -20,7 +20,6 @@ QWeatherApiHandler::QWeatherApiHandler(std::shared_ptr<backend::WeatherApiHandle
 		std::bind(&QWeatherApiHandler::fetchDataFinishedCallback, this));
 }
 
-
 Q_INVOKABLE void QWeatherApiHandler::setApiKey(const QString& apiKey)
 {
 	weatherApiHandler_->setApiKey(apiKey.toStdString());
