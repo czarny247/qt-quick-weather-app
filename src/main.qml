@@ -262,7 +262,7 @@ ApplicationWindow {
 						weather_output_layout.visible = false
 						errorUserFeedback.visible = true
 						weather_input_layout.visible = true
-						sendbutton.visible = true
+						weather_button.visible = true
 
 					}
 				}
