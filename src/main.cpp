@@ -4,6 +4,7 @@
 #include <cpprest/filestream.h>
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <QGuiApplication>
@@ -20,6 +21,18 @@ using namespace web::http;
 using namespace web::json;
 using namespace web;
 
+QObject* createQWeatherApiHandlerForOpenWeatherApi(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+	Q_UNUSED(engine)
+	Q_UNUSED(scriptEngine)
+
+	std::shared_ptr<WeatherApiHandler> openWeatherMapApi = std::make_shared<WeatherApiHandler>(
+		std::string(openWeatherMapApiUrl),
+		std::string(openWeatherMapApiUriPrefix));
+
+	QWeatherApiHandler *handler = new QWeatherApiHandler(openWeatherMapApi);
+	return handler;
+}
 int main(int argc, char *argv[])
 {
 	QGuiApplication app(argc, argv);
@@ -33,15 +46,8 @@ int main(int argc, char *argv[])
 	QQmlApplicationEngine appEngine;
 
 	//move to class - static method
-	qmlRegisterSingletonType<QWeatherApiHandler>("Qt.WeatherApiHandler", 1, 0, "OpenWeatherMapApi",
-		[&openWeatherMapApi](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject *
-		{
-			Q_UNUSED(engine)
-			Q_UNUSED(scriptEngine)
-
-			QWeatherApiHandler *handler = new QWeatherApiHandler(openWeatherMapApi);
-			return handler;
-		});
+	qmlRegisterSingletonType<QWeatherApiHandler>("Qt.WeatherApiHandler", 1, 0, "OpenWeatherMapApi", 
+		createQWeatherApiHandlerForOpenWeatherApi);
 
 	temperature_type::registerInQml();
 	temperature_scale::registerInQml();
