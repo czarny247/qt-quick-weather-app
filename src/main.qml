@@ -1,10 +1,10 @@
-import QtQuick 2.14
-import QtQuick.Window 2.14
-import QtQuick.Controls 2.14
-import QtQuick.Controls.Material 2.14
-import QtQml 2.14
-import QtQuick.Layouts 1.14
-import QtQml.Models 2.14
+import QtQuick 2.0
+import QtQuick.Window 2.0
+import QtQuick.Controls 2.1
+import QtQuick.Controls.Material 2.0
+import QtQml 2.0
+import QtQuick.Layouts 1.0
+import QtQml.Models 2.1
 import Qt.WeatherApiHandler 1.0
 import SharedEnums.TemperatureType 1.0
 import SharedEnums.TemperatureScale 1.0
