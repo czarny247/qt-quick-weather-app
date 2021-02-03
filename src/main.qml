@@ -5,22 +5,27 @@ import QtQuick.Controls.Material 2.14
 import QtQml 2.14
 import QtQuick.Layouts 1.14
 import QtQml.Models 2.14
+import QtQuick.Dialogs 1.3
 import Qt.WeatherApiHandler 1.0
 import SharedEnums.TemperatureType 1.0
 import SharedEnums.TemperatureScale 1.0
+import Qt.ScaleProperties 1.0
 
 ApplicationWindow {
 	id: window
 	visible: true
 	minimumWidth: weather_layout.width + errorUserFeedback.width
 	minimumHeight: weather_layout.height + errorUserFeedback.height + overlayHeader.height
-	width: 800
-	height: 600
+	width: Screen.desktopAvailableWidth
+	height: Screen.desktopAvailableHeight
+
+	//width: 800
+	//height: 600
 
 	ToolBar {
 		id: overlayHeader
 		z: 1
-		width: parent.width
+		width: window.width
 		parent: window.overlay
 
 		RowLayout {
@@ -29,7 +34,10 @@ ApplicationWindow {
 				id: hamburgerButton
 				property var hamburgerMenuVisible: false
 				text: qsTr("H")
-				onClicked: hamburgerMenuVisible = !hamburgerMenuVisible
+				onClicked: {
+					hamburgerMenuVisible = !hamburgerMenuVisible
+				} 
+					
 			}
 
 			ToolSeparator {
@@ -38,6 +46,7 @@ ApplicationWindow {
 			Label {
 				id: label
 				text: "Qt Quick Weather App"
+				font.pixelSize: ScaleProperties.textSizeSmall
 			}
 		}
 	}
@@ -45,7 +54,7 @@ ApplicationWindow {
 	Drawer {
 		id: drawer
 		y: overlayHeader.height
-		width: window.width / 2
+		width: window.width * 0.5
 		height: window.height - overlayHeader.height
 		visible: hamburgerButton.hamburgerMenuVisible
 
@@ -63,6 +72,7 @@ ApplicationWindow {
 			
 			Button {
 				id: weatherButton
+				visible: false
 				Layout.preferredWidth: parent.width
 				text: "Weather"
 				onClicked: {
@@ -101,22 +111,24 @@ ApplicationWindow {
 
 				Popup {
 					id: set_api_key_help_popup
-					x: main_mouse_area.mouseX - parent.width/2
-					y: main_mouse_area.mouseY - parent.height/2
+					x: parent.x - width
+					y: parent.y - height/2
 					modal: true
 					focus: true
 					closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 					contentItem: Text {
+						id: set_api_key_help_text
 						anchors.centerIn: parent
 						text: "For more info regarding API key, go here: \
 							<a href='https://openweathermap.org/'>https://openweathermap.org/</a>"
 						onLinkActivated: Qt.openUrlExternally(link)
 
-						MouseArea {
-							anchors.fill: parent
-							acceptedButtons: Qt.NoButton
-							cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-						}
+						//todo: fix this, because it's not working, probably due to mouse area inside another one
+						// MouseArea {
+						// 	anchors.fill: parent
+						// 	acceptedButtons: Qt.NoButton
+						// 	cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+						// }
 					}
 				}
 			}
@@ -139,6 +151,7 @@ ApplicationWindow {
 						{
 							set_api_key_layout.visible = false
 							weather_layout.visible = true
+							weatherButton.visible = true
 						}
 					}
 				}
@@ -226,7 +239,7 @@ ApplicationWindow {
 			}
 			TextArea {
 				id: errorUserFeedback
-				text: "sth" //change placeholder text and add label for this text area - wrap it in row layout
+				placeholderText: "error feedback"
 				function updateText(text, color)
 				{
 					errorUserFeedback.text = text
@@ -262,7 +275,9 @@ ApplicationWindow {
 						weather_output_layout.visible = false
 						errorUserFeedback.visible = true
 						weather_input_layout.visible = true
-						sendbutton.visible = true
+						weather_button.visible = true
+						zip_code.text = ""
+						country_code.text = ""
 
 					}
 				}

@@ -22,6 +22,7 @@ using namespace web;
 
 int main(int argc, char *argv[])
 {
+	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QGuiApplication app(argc, argv);
 
 	std::shared_ptr<WeatherApiHandler> openWeatherMapApi = std::make_shared<WeatherApiHandler>(
@@ -42,6 +43,8 @@ int main(int argc, char *argv[])
 			QWeatherApiHandler *handler = new QWeatherApiHandler(openWeatherMapApi);
 			return handler;
 		});
+
+	qmlRegisterSingletonType(QUrl("qrc:/ScaleProperties.qml"), "Qt.ScaleProperties", 1, 0, "ScaleProperties");
 
 	temperature_type::registerInQml();
 	temperature_scale::registerInQml();
