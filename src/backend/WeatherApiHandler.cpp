@@ -1,3 +1,4 @@
+#include "backend/ApiKey.hpp"
 #include "WeatherApiHandler.hpp"
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
@@ -11,13 +12,6 @@ using namespace web::http;
 using namespace web::json;
 using namespace web;
 
-namespace
-{
-
-
-
-}
-
 namespace backend
 {
 
@@ -26,11 +20,6 @@ WeatherApiHandler::WeatherApiHandler(std::string&& clientUrl, std::string&& requ
 , requestUriPrefix_(std::move(requestUriPrefix))
 {
 
-}
-
-void WeatherApiHandler::setApiKey(const std::string& apiKey)
-{
-	apiKey_ = apiKey;
 }
 
 WeatherApiResponseData* WeatherApiHandler::fetchData(const std::string& zipCode, const std::string& countryCode)
@@ -49,7 +38,7 @@ WeatherApiResponseData* WeatherApiHandler::fetchData(const std::string& zipCode,
 	uri.append(",");
 	uri.append(countryCode.c_str());
 	uri.append("&appid=");
-	uri.append(apiKey_.c_str());
+	uri.append(getApiKey().c_str());
 
 	if(!web::uri::validate(uri))
 	{
@@ -77,7 +66,7 @@ WeatherApiResponseData* WeatherApiHandler::fetchData(const GPSCoordinates& coord
 	uri_builder builder(U(requestUriPrefix_));
 	builder.append_query(U("lat"), U(std::to_string(coords.latitude_).c_str()));
 	builder.append_query(U("&lon"), U(std::to_string(coords.longitude_).c_str()), false);
-	builder.append_query(U("&appid"), U(apiKey_.c_str()), false);
+	builder.append_query(U("&appid"), U(getApiKey().c_str()), false);
 
 	auto json = fetchDataImpl(builder.to_string(), clientUrl_).get();
 	return new WeatherApiResponseData(json);

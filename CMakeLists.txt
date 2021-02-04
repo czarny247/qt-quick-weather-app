@@ -11,9 +11,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+#todo build default for host or non-default for chosen system
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(Qt5QuickCompiler_DIR "/usr/local/opt/qt5/lib/cmake/Qt5QuickCompiler")
     set(Qt5_DIR "/usr/local/opt/qt5/lib/cmake/Qt5")
+endif()
+
+if(API_KEY)
+	configure_file(src/backend/ApiKey.hpp.in src/backend/ApiKey.hpp)
+else()
+	message(FATAL_ERROR "Missing API_KEY! Check details in README") #todo add instructions to readme
 endif()
 
 find_package(cpprestsdk REQUIRED)
@@ -23,7 +30,8 @@ qt5_add_resources(qml_QRC src/qml.qrc)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src
+	${PROJECT_BINARY_DIR}/src)
 
 set(SOURCE 
 	${SOURCE}
@@ -37,6 +45,7 @@ set(SOURCE
 	src/qtquick/QWeatherApiHandler.hpp
 	src/qtquick/QWeatherApiHandler.cpp
 	src/3party/HttpStatusCodes_C++11.h
+	${PROJECT_BINARY_DIR}/src/backend/ApiKey.hpp
 )
 
 add_executable(qt-quick-weather-app ${SOURCE} ${qml_QRC})

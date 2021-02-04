@@ -1,0 +1,8 @@
+#pragma once
+
+#include <string>
+
+std::string getApiKey()
+{
+	return "@API_KEY@";
+}

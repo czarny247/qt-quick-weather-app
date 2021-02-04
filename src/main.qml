@@ -19,9 +19,6 @@ ApplicationWindow {
 	width: Screen.desktopAvailableWidth
 	height: Screen.desktopAvailableHeight
 
-	//width: 800
-	//height: 600
-
 	ToolBar {
 		id: overlayHeader
 		z: 1
@@ -33,7 +30,7 @@ ApplicationWindow {
 				Layout.alignment: Qt.AlignLeft
 				id: hamburgerButton
 				property var hamburgerMenuVisible: false
-				text: qsTr("H")
+				text: qsTr("☰")
 				onClicked: {
 					hamburgerMenuVisible = !hamburgerMenuVisible
 				} 
@@ -60,23 +57,13 @@ ApplicationWindow {
 
 		ColumnLayout {
 			width: parent.width
-			Button {
-				id: settingsButton
-				Layout.preferredWidth: parent.width
-				text: "Settings"
-				onClicked: {
-					set_api_key_layout.visible = true
-					weather_layout.visible = false
-				}
-			}
 			
 			Button {
 				id: weatherButton
-				visible: false
+				visible: true
 				Layout.preferredWidth: parent.width
 				text: "Weather"
 				onClicked: {
-					set_api_key_layout.visible = false
 					weather_layout.visible = true
 				}
 			}
@@ -86,82 +73,6 @@ ApplicationWindow {
 	MouseArea {
 		anchors.fill: parent
 		id: main_mouse_area
-
-		RowLayout {
-			anchors.centerIn: parent
-			y: overlayHeader.height
-			id: set_api_key_layout
-			visible: true
-
-			TextField {
-				id: set_api_key_text
-				placeholderText: qsTr("Enter api key")
-				echoMode: TextInput.Password
-				onPressed : {
-					text = ""
-					color = "black"
-					echoMode = TextInput.Password
-				}
-			}
-
-			RoundButton {
-				id: set_api_key_help_button
-				text: "?"
-				onClicked : set_api_key_help_popup.open()
-
-				Popup {
-					id: set_api_key_help_popup
-					x: parent.x - width
-					y: parent.y - height/2
-					modal: true
-					focus: true
-					closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-					contentItem: Text {
-						id: set_api_key_help_text
-						anchors.centerIn: parent
-						text: "For more info regarding API key, go here: \
-							<a href='https://openweathermap.org/'>https://openweathermap.org/</a>"
-						onLinkActivated: Qt.openUrlExternally(link)
-
-						//todo: fix this, because it's not working, probably due to mouse area inside another one
-						// MouseArea {
-						// 	anchors.fill: parent
-						// 	acceptedButtons: Qt.NoButton
-						// 	cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-						// }
-					}
-				}
-			}
-
-			Button {
-				id: set_api_key_button
-				text: "SET"
-
-				Connections {
-					target: OpenWeatherMapApi
-					onFetchDataFinished : {
-						var responseStatus = OpenWeatherMapApi.responseStatusCode()
-						if(responseStatus == 401) {
-							set_api_key_text.text = OpenWeatherMapApi.responseStatusUserFeedback()
-							set_api_key_text.color = "red"
-							set_api_key_text.echoMode = TextInput.Normal
-							set_api_key_text.width = set_api_key_text.contentWidth
-						}
-						else
-						{
-							set_api_key_layout.visible = false
-							weather_layout.visible = true
-							weatherButton.visible = true
-						}
-					}
-				}
-
-				onClicked: {
-					OpenWeatherMapApi.setApiKey(set_api_key_text.text)
-					OpenWeatherMapApi.fetchData("0", "0") //just call to check if api key is valid
-				}
-			}
-		}
 
 		GridLayout
 		{
