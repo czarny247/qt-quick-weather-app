@@ -21,6 +21,7 @@ if(API_KEY)
 	configure_file(src/backend/ApiKey.hpp.in src/backend/ApiKey.hpp)
 else()
 	message(FATAL_ERROR "Missing API_KEY! Check details in README") #todo add instructions to readme
+	#todo get api key from jsonfile - prepare json template
 endif()
 
 find_package(cpprestsdk REQUIRED)
