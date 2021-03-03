@@ -2,5 +2,12 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>ScaleProperties.qml</file>
+        <file>HamburgerMenu.qml</file>
+        <file>GPSComponent.qml</file>
+        <file>OverlayHeader.qml</file>
+        <file>CurrentWeatherButton.qml</file>
+        <file>ResetWeatherButton.qml</file>
+        <file>RefreshWeatherButton.qml</file>
+        <file>CurrentWeatherOutputLayout.qml</file>
     </qresource>
 </RCC>

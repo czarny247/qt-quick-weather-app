@@ -10,6 +10,7 @@ import Qt.WeatherApiHandler 1.0
 import SharedEnums.TemperatureType 1.0
 import SharedEnums.TemperatureScale 1.0
 import Qt.ScaleProperties 1.0
+import QtPositioning 5.11
 
 ApplicationWindow {
 	id: window
@@ -19,60 +20,24 @@ ApplicationWindow {
 	width: Screen.desktopAvailableWidth
 	height: Screen.desktopAvailableHeight
 
-	ToolBar {
-		id: overlayHeader
-		z: 1
-		width: window.width
-		parent: window.overlay
+    GPSComponent {
+    	id: gps
+    }
 
-		RowLayout {
-			ToolButton {
-				Layout.alignment: Qt.AlignLeft
-				id: hamburgerButton
-				property var hamburgerMenuVisible: false
-				text: qsTr("☰")
-				onClicked: {
-					hamburgerMenuVisible = !hamburgerMenuVisible
-				} 
-					
-			}
+    OverlayHeader {
+    	id: overlayHeader
+    }
 
-			ToolSeparator {
-			}
-
-			Label {
-				id: label
-				text: "Qt Quick Weather App"
-				font.pixelSize: ScaleProperties.textSizeSmall
-			}
-		}
-	}
-
-	Drawer {
-		id: drawer
-		y: overlayHeader.height
-		width: window.width * 0.5
-		height: window.height - overlayHeader.height
-		visible: hamburgerButton.hamburgerMenuVisible
-
-		ColumnLayout {
-			width: parent.width
-			
-			Button {
-				id: weatherButton
-				visible: true
-				Layout.preferredWidth: parent.width
-				text: "Weather"
-				onClicked: {
-					weather_layout.visible = true
-				}
-			}
-		}
+	HamburgerMenu {
+		id: hamburgerMenu
 	}
 
 	MouseArea {
 		anchors.fill: parent
 		id: main_mouse_area
+
+		//todo: add disclaimer if api key is incorrect
+		//check api key by fetching data
 
 		GridLayout
 		{
@@ -84,6 +49,11 @@ ApplicationWindow {
 			GridLayout {
 				id: weather_input_layout
 				columns: 2
+
+				Connections {
+					target: current_weather_button
+					onWeatherUpdated: weather_input_layout.visible = false
+				}
 
 				GridLayout {
 					id: grid_text
@@ -100,52 +70,8 @@ ApplicationWindow {
 					}
 				}
 
-				Button {
-					id: weather_button
-					text: "CURRENT WEATHER"
-
-					Connections {
-						target: OpenWeatherMapApi
-						onFetchDataFinished : {
-							if(weather_layout.visible == true)
-							{
-								if(!OpenWeatherMapApi.isUriValid())
-								{
-									errorUserFeedback.updateText("Please provide valid country code and zip code.", "red")
-									zip_code.text = ""
-									country_code.text = ""
-								}
-								else
-								{
-									var responseStatus = OpenWeatherMapApi.responseStatusCode()
-									if(responseStatus != 200) //todo: use type from backend rather than int
-									{
-										errorUserFeedback.updateText(OpenWeatherMapApi.responseStatusInfo(), "red")
-										if(responseStatus == 404)
-										{
-											zip_code.text = ""
-											country_code.text = ""
-										}
-									}
-									else
-									{
-										cityName.text = OpenWeatherMapApi.cityName(true)
-										temperature.text = OpenWeatherMapApi.temperature(TemperatureType.Average, 
-											TemperatureScale.Celsius)
-
-										errorUserFeedback.visible = false
-										weather_input_layout.visible = false
-										weather_button.visible = false
-										weather_output_layout.visible = true
-									}
-								}
-							}
-						}
-					}
-
-					onClicked: {
-						OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
-					}
+				CurrentWeatherButton {
+					id: current_weather_button
 				}
 			}
 			TextArea {
@@ -156,16 +82,39 @@ ApplicationWindow {
 					errorUserFeedback.text = text
 					errorUserFeedback.color = color
 				}
+
+				Connections {
+					target: current_weather_button
+					onWeatherUpdated: errorUserFeedback.visible = false
+				}
 			}
+
+			CurrentWeatherOutputLayout {
+				id: current_weather_output_layout
+				Connections {
+					target: current_weather_button
+					onWeatherUpdated: current_weather_output_layout.updateCityAndTemperature()
+				}
+			}
+		}
+
+		GridLayout
+		{
+			anchors.centerIn: parent
+			anchors.verticalCenterOffset: overlayHeader.height
+			id: current_location_layout
+			columns: 1
+			visible: true
+
 			ColumnLayout {
-				id: weather_output_layout
-				visible: false
+				id: current_location_weather_output_layout
+				visible: true
 				RowLayout {
 					Label {
 						text: "City:"
 					}
 					TextArea {
-						id: cityName
+						id: current_location_cityName
 						placeholderText: "CityName, CoutryCode"
 					}
 				}
@@ -174,41 +123,20 @@ ApplicationWindow {
 						text: "Temperature:"
 					}
 					TextArea {
-						id: temperature
+						id: current_location_temperature
 						placeholderText: "Temperature in Celsius"
 					}
 				}
-				Button {
-					text: "RESET"
-					onClicked: {
-						cityName.text = cityName.placeholderText
-						temperature.text = temperature.placeholderText
-						weather_output_layout.visible = false
-						errorUserFeedback.visible = true
-						weather_input_layout.visible = true
-						weather_button.visible = true
-						zip_code.text = ""
-						country_code.text = ""
 
-					}
-				}
-
-				Button {
-					text: "REFRESH"
-					Connections {
-						target: OpenWeatherMapApi
-						onFetchDataFinished : {
-							cityName.text = OpenWeatherMapApi.cityName(true)
-							temperature.text = OpenWeatherMapApi.temperature(TemperatureType.Average,
+				Connections {
+					target: OpenWeatherMapApi
+					onFetchDataFinished : {
+						current_location_cityName.text = OpenWeatherMapApi.cityName(true)
+						current_location_temperature.text = OpenWeatherMapApi.temperature(TemperatureType.Average,
 								TemperatureScale.Celsius)
-						}
-					}
-
-					onClicked: {
-						OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
 					}
 				}
-			}
+			}		
 		}
 	}
 }

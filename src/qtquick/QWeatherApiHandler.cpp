@@ -20,16 +20,15 @@ QWeatherApiHandler::QWeatherApiHandler(std::shared_ptr<backend::WeatherApiHandle
 		std::bind(&QWeatherApiHandler::fetchDataFinishedCallback, this));
 }
 
-
-Q_INVOKABLE void QWeatherApiHandler::setApiKey(const QString& apiKey)
-{
-	weatherApiHandler_->setApiKey(apiKey.toStdString());
-}
-
 Q_INVOKABLE void QWeatherApiHandler::fetchData(const QString& zipCode, 
 	const QString& countryCode)
 {
 	data_.reset(weatherApiHandler_->fetchData(zipCode.toStdString(), countryCode.toStdString()));
+}
+
+Q_INVOKABLE void QWeatherApiHandler::fetchData(const QGeoCoordinate& coords)
+{
+	data_.reset(weatherApiHandler_->fetchData({coords.latitude(), coords.longitude()}));
 }
 
 Q_INVOKABLE int QWeatherApiHandler::responseStatusCode()
