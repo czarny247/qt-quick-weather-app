@@ -32,138 +32,9 @@ std::string userFeedback(HttpStatus::Code code)
 namespace backend
 {
 
-WeatherApiResponseData::WeatherApiResponseData(web::json::value& weatherApiResponseBody)
-: weatherApiResponseBody_(weatherApiResponseBody)
-{
-}
-
 WeatherApiResponseData::WeatherApiResponseData(QJsonObject& weatherApiResponseBody)
 : weatherApiResponseBodyQ_(weatherApiResponseBody)
 {
-}
-
-unsigned int WeatherApiResponseData::responseStatusCode()
-{
-	int result {0};
-
-	try
-	{
-		if(weatherApiResponseBody_["cod"].is_string())
-		{
-			result = std::stoi(weatherApiResponseBody_["cod"].as_string());
-		}
-
-		if(weatherApiResponseBody_["cod"].is_integer())
-		{
-			result = weatherApiResponseBody_["cod"].as_integer();
-		}
-	}
-	catch(const web::json::json_exception& e)
-	{
-		result = 0;
-	}
-
-	return result;
-}
-
-std::string WeatherApiResponseData::responseStatusInfo()
-{
-	int code = responseStatusCode();
-	std::string reasonPhrase = HttpStatus::reasonPhrase(code);
-	return {std::to_string(code) + ": " + reasonPhrase + ". " 
-		+ userFeedback(static_cast<HttpStatus::Code>(code))};
-}
-
-std::string WeatherApiResponseData::responseStatusUserFeedback()
-{
-	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCode()))};
-}
-
-std::string WeatherApiResponseData::cityName(bool withCountryCode)
-{
-	std::string result {""};
-
-	try
-	{
-		result = weatherApiResponseBody_["name"].as_string() + (withCountryCode 
-			? std::string(", ").append(weatherApiResponseBody_["sys"]["country"].as_string())
-			: "");
-	}
-	catch(const web::json::json_exception& e)
-	{
-		//todo: print to console in debug mode
-		result = "-";
-	}
-
-	return result;
-}
-
-std::string WeatherApiResponseData::temperature(TemperatureType type, TemperatureScale scale)
-{
-	std::string result {""};
-
-	try
-	{
-		auto temperatures = weatherApiResponseBody_["main"];
-		double temperature =
-			[](auto& temps, TemperatureType type) -> double
-			{
-				try
-				{
-					switch(type)
-					{
-					case TemperatureType::Average:
-						return temps["temp"].as_double();
-					case TemperatureType::Max:
-						return temps["temp_max"].as_double();
-					case TemperatureType::Min:
-						return temps["temp_min"].as_double();
-					case TemperatureType::FeelsLike:
-						return temps["feels_like"].as_double();
-					default:
-						return 0.0; //?
-					}
-				}
-				catch(const web::json::json_exception& e)
-				{
-					throw e;
-				}
-			}(temperatures, type);
-
-		auto convertTempByScale =
-			[](double temperature, TemperatureScale scale) -> double
-			{
-				switch(scale)
-				{
-				case TemperatureScale::Kelvin:
-					return temperature; //because api provides temperature in Kelvins
-				case TemperatureScale::Celsius:
-				{
-					static constexpr double celsiusOffset {273.15};
-					return temperature - celsiusOffset;
-				}
-				case TemperatureScale::Fahrenheit:
-				{
-					static constexpr double fahrenheitOffset {459.67};
-					static constexpr double fahrenheitFactor {9.0/5.0};
-					return temperature * fahrenheitFactor - fahrenheitOffset;
-				}
-	
-				default:
-					return temperature;
-				}
-			};
-	
-		result = std::to_string(static_cast<int>(std::round(convertTempByScale(temperature, scale))));
-
-	}
-	catch(const web::json::json_exception& e)
-	{
-		//todo: print to console in debug mode
-		result = "-";
-	}
-
-	return result;
 }
 
 unsigned int WeatherApiResponseData::responseStatusCodeQ()
@@ -181,7 +52,7 @@ unsigned int WeatherApiResponseData::responseStatusCodeQ()
 
 std::string WeatherApiResponseData::responseStatusInfoQ()
 {
-	int code = responseStatusCode();
+	int code = responseStatusCodeQ();
 	std::string reasonPhrase = HttpStatus::reasonPhrase(code);
 	return {std::to_string(code) + ": " + reasonPhrase + ". " 
 		+ userFeedback(static_cast<HttpStatus::Code>(code))};
@@ -189,7 +60,7 @@ std::string WeatherApiResponseData::responseStatusInfoQ()
 
 std::string WeatherApiResponseData::responseStatusUserFeedbackQ()
 {
-	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCode()))};
+	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCodeQ()))};
 }
 
 std::string WeatherApiResponseData::cityNameQ(bool withCountryCode)

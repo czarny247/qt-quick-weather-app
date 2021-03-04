@@ -28,11 +28,6 @@ public:
 
 	~QWeatherApiHandler() = default;
 
-	Q_INVOKABLE void fetchData(const QString& zipCode, 
-		const QString& countryCode);
-
-	Q_INVOKABLE void fetchData(const QGeoCoordinate& coords);
-
 	Q_INVOKABLE void getData(const QString& zipCode, 
 		const QString& countryCode);
 

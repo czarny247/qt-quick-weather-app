@@ -53,9 +53,7 @@ set(PRIVATE_LINK_LIBRARIES
 	Qt5::Qml
 	Qt5::Quick
 	Qt5::Positioning
-	Qt5::Network
-	cpprestsdk::cpprest
-	OpenSSL::Crypto)
+	Qt5::Network)
 
 add_executable(qt-quick-weather-app ${SOURCE} ${qml_QRC})
 target_link_libraries(qt-quick-weather-app PRIVATE ${PRIVATE_LINK_LIBRARIES})
