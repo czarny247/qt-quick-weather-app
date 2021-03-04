@@ -1,8 +1,6 @@
 #pragma once
 
 #include <string>
-#include <cpprest/json.h>
-#include <cpprest/http_client.h>
 #include <functional>
 
 #include "backend/GPSCoordinates.hpp"
@@ -21,10 +19,11 @@ public:
 	WeatherApiHandler(const WeatherApiHandler&) = delete;
 	WeatherApiHandler& operator=(const WeatherApiHandler&) = delete;
 
-	WeatherApiResponseData* fetchData(const std::string& zipCode, const std::string& countryCode);
-	WeatherApiResponseData* fetchData(const GPSCoordinates& coords);
 	bool isUriValid();
 	void setFetchDataFinishedCallback(std::function<void(void)> callback);
+
+	std::string getRequestUrlZipCountry(const std::string& zipCode, const std::string& countryCode);
+	std::string getRequestUrlGPS(const GPSCoordinates& coords);
 
 
 private:
@@ -32,8 +31,6 @@ private:
 	const std::string requestUriPrefix_ {};
 	bool isUriValid_ {false};
 	std::function<void(void)> fetchDataFinishedCallback_;
-
-	pplx::task<web::json::value> fetchDataImpl(const std::string& requestUri, const std::string& clientUrl);
 };
 
 }

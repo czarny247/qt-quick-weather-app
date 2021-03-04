@@ -1,9 +1,6 @@
 #include "backend/WeatherApiConstants.hpp"
 #include "backend/WeatherApiHandler.hpp"
 #include "qtquick/QWeatherApiHandler.hpp"
-#include <cpprest/filestream.h>
-#include <cpprest/http_client.h>
-#include <cpprest/json.h>
 #include <iostream>
 #include <memory>
 #include <QGuiApplication>
@@ -12,13 +9,7 @@
 #include "utils/shared_enums/TemperatureScale.hpp"
 
 using namespace backend;
-using namespace concurrency::streams;
 using namespace qtquick;
-using namespace utility;
-using namespace web::http::client;
-using namespace web::http;
-using namespace web::json;
-using namespace web;
 
 int main(int argc, char *argv[])
 {

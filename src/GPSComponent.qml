@@ -23,10 +23,10 @@ PositionSource {
         }
        	
        	console.log("Position Source Loaded || Supported: "+supPos+" Valid: "+valid);
-        OpenWeatherMapApi.fetchData(src.position.coordinate)
+        OpenWeatherMapApi.getData(src.position.coordinate)
     }
 
     onPositionChanged: {
-    	OpenWeatherMapApi.fetchData(src.position.coordinate)
+    	OpenWeatherMapApi.getData(src.position.coordinate)
     }
 }

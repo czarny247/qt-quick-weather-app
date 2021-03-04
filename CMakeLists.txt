@@ -25,7 +25,7 @@ else()
 endif()
 
 find_package(cpprestsdk REQUIRED)
-find_package(Qt5 REQUIRED Qml Quick Gui Core Positioning)
+find_package(Qt5 REQUIRED Qml Quick Gui Core Positioning Network)
 find_package(Qt5QuickCompiler)
 qt5_add_resources(qml_QRC src/qml.qrc)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
@@ -52,9 +52,8 @@ set(SOURCE
 set(PRIVATE_LINK_LIBRARIES
 	Qt5::Qml
 	Qt5::Quick
-	Qt::Positioning
-	cpprestsdk::cpprest
-	OpenSSL::Crypto)
+	Qt5::Positioning
+	Qt5::Network)
 
 add_executable(qt-quick-weather-app ${SOURCE} ${qml_QRC})
 target_link_libraries(qt-quick-weather-app PRIVATE ${PRIVATE_LINK_LIBRARIES})

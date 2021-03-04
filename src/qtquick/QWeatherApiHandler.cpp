@@ -7,11 +7,26 @@
 #include <QMetaObject>
 #include <QQmlComponent>
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QUrl>
+#include <QJsonDocument>
+
 #include <cassert>
 #include <utility>
 
 namespace qtquick
 {
+
+void QWeatherApiHandler::dataFetched(QNetworkReply* reply)
+{
+	QString strReply = (QString)reply->readAll();
+    qDebug() << "Response:" << strReply;
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
+	QJsonObject jsonObj = jsonResponse.object();
+	dataObj_.reset(new backend::WeatherApiResponseData(jsonObj));
+	this->fetchDataFinishedCallback();
+}
 
 QWeatherApiHandler::QWeatherApiHandler(std::shared_ptr<backend::WeatherApiHandler> weatherApiHandler)
 : weatherApiHandler_(weatherApiHandler)
@@ -20,39 +35,49 @@ QWeatherApiHandler::QWeatherApiHandler(std::shared_ptr<backend::WeatherApiHandle
 		std::bind(&QWeatherApiHandler::fetchDataFinishedCallback, this));
 }
 
-Q_INVOKABLE void QWeatherApiHandler::fetchData(const QString& zipCode, 
+Q_INVOKABLE void QWeatherApiHandler::getData(const QString& zipCode, 
 	const QString& countryCode)
 {
-	data_.reset(weatherApiHandler_->fetchData(zipCode.toStdString(), countryCode.toStdString()));
+	QNetworkAccessManager* network = new QNetworkAccessManager(this);
+	connect(network, &QNetworkAccessManager::finished, this, &QWeatherApiHandler::dataFetched);
+	const QUrl url = QUrl(QString::fromStdString(weatherApiHandler_->getRequestUrlZipCountry(
+		zipCode.toStdString(), countryCode.toStdString())));
+	QNetworkRequest req(url);
+	network->get(req);
 }
 
-Q_INVOKABLE void QWeatherApiHandler::fetchData(const QGeoCoordinate& coords)
+Q_INVOKABLE void QWeatherApiHandler::getData(const QGeoCoordinate& coords)
 {
-	data_.reset(weatherApiHandler_->fetchData({coords.latitude(), coords.longitude()}));
+	QNetworkAccessManager* network = new QNetworkAccessManager(this);
+	connect(network, &QNetworkAccessManager::finished, this, &QWeatherApiHandler::dataFetched);
+	const QUrl url = QUrl(QString::fromStdString(weatherApiHandler_->getRequestUrlGPS(
+		{coords.latitude(), coords.longitude()})));
+	QNetworkRequest req(url);
+	network->get(req);
 }
 
 Q_INVOKABLE int QWeatherApiHandler::responseStatusCode()
 {
-	assert(data_ != nullptr);
-	return data_->responseStatusCode();
+	assert(dataObj_ != nullptr);
+	return dataObj_->responseStatusCodeQ();
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusInfo()
 {
-	assert(data_ != nullptr);
-	return QString::fromStdString(data_->responseStatusInfo());
+	assert(dataObj_ != nullptr);
+	return QString::fromStdString(dataObj_->responseStatusInfoQ());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusUserFeedback()
 {
-	assert(data_ != nullptr);
-	return QString::fromStdString(data_->responseStatusUserFeedback());
+	assert(dataObj_ != nullptr);
+	return QString::fromStdString(dataObj_->responseStatusUserFeedbackQ());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::cityName(bool withCountryCode)
 {
-	assert(data_ != nullptr);
-	return QString::fromStdString(data_->cityName(withCountryCode));
+	assert(dataObj_ != nullptr);
+	return QString::fromStdString(dataObj_->cityNameQ(withCountryCode));
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int temperatureScale)
@@ -63,8 +88,8 @@ Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int tem
 
 QString QWeatherApiHandler::temperature(TemperatureType type, TemperatureScale scale)
 {
-	assert(data_ != nullptr);
-	return QString::fromStdString(data_->temperature(type, scale)) 
+	assert(dataObj_ != nullptr);
+	return QString::fromStdString(dataObj_->temperatureQ(type, scale)) 
 		+ temperature_scale::temperatureUnit(scale);
 }
 
