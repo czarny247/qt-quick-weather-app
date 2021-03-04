@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cpprest/json.h>
+#include <QJsonObject>
 
 #include "utils/shared_enums/TemperatureScale.hpp"
 #include "utils/shared_enums/TemperatureType.hpp"
@@ -17,6 +18,7 @@ class WeatherApiResponseData
 
 public:
 	WeatherApiResponseData(web::json::value& weatherApiResponseBody);
+	WeatherApiResponseData(QJsonObject& weatherApiResponseBody);
 	WeatherApiResponseData(const WeatherApiResponseData&) = default;
 	WeatherApiResponseData& operator=(const WeatherApiResponseData&) = default;
 
@@ -26,8 +28,15 @@ public:
 	std::string cityName(bool withCountryCode);
 	std::string temperature(TemperatureType type, TemperatureScale scale);
 
+	unsigned int responseStatusCodeQ();
+	std::string responseStatusInfoQ();
+	std::string responseStatusUserFeedbackQ();
+	std::string cityNameQ(bool withCountryCode);
+	std::string temperatureQ(TemperatureType type, TemperatureScale scale);
+
 private:
 	web::json::value weatherApiResponseBody_;
+	QJsonObject weatherApiResponseBodyQ_;
 
 };
 

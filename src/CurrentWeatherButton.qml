@@ -49,6 +49,7 @@ Button {
 	}
 
 	onClicked: {
-		OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
+		//OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
+		OpenWeatherMapApi.getData(zip_code.text, country_code.text)
 	}
 }

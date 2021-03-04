@@ -26,6 +26,9 @@ public:
 	bool isUriValid();
 	void setFetchDataFinishedCallback(std::function<void(void)> callback);
 
+	std::string getRequestUrlZipCountry(const std::string& zipCode, const std::string& countryCode);
+	std::string getRequestUrlGPS(const GPSCoordinates& coords);
+
 
 private:
 	const std::string clientUrl_ {};

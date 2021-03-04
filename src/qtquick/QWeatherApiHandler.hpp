@@ -12,6 +12,8 @@
 #include <memory>
 #include <functional>
 
+#include <QNetworkReply>
+
 using TemperatureType = temperature_type::TemperatureType;
 using TemperatureScale = temperature_scale::TemperatureScale;
 
@@ -31,6 +33,11 @@ public:
 
 	Q_INVOKABLE void fetchData(const QGeoCoordinate& coords);
 
+	Q_INVOKABLE void getData(const QString& zipCode, 
+		const QString& countryCode);
+
+	Q_INVOKABLE void getData(const QGeoCoordinate& coords);
+
 	Q_INVOKABLE int responseStatusCode();
 	Q_INVOKABLE QString responseStatusInfo();
 	Q_INVOKABLE QString responseStatusUserFeedback();
@@ -43,12 +50,16 @@ public:
 private:
 	std::shared_ptr<backend::WeatherApiHandler> weatherApiHandler_ {nullptr};
 	std::unique_ptr<backend::WeatherApiResponseData> data_ {nullptr};
+	std::unique_ptr<backend::WeatherApiResponseData> dataObj_ {nullptr};
 
 	//workaround - see: https://bugreports.qt.io/browse/QTBUG-19741
 	QString temperature(TemperatureType type, TemperatureScale scale);
 
 signals:
 	void fetchDataFinished();
+
+private slots:
+	void dataFetched(QNetworkReply*);
 };
 
 }
