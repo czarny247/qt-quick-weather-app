@@ -25,7 +25,13 @@ else()
 endif()
 
 find_package(cpprestsdk REQUIRED)
-find_package(Qt5 REQUIRED Qml Quick Gui Core Positioning Network)
+find_package(Qt5 REQUIRED 
+	Qml
+	Quick
+	Gui
+	Core
+	Positioning
+	Network)
 find_package(Qt5QuickCompiler)
 qt5_add_resources(qml_QRC src/qml.qrc)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
