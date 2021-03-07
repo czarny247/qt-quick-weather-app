@@ -7,6 +7,11 @@ Button {
 
 	signal weatherUpdated
 
+	//todo all of these logic shouldn't be in button
+	//todo button should only send on clicked and that's all
+	//todo firstly refactor it to functions
+	//signal uriValidationFailed
+
 	Connections {
 		target: OpenWeatherMapApi
 
@@ -16,8 +21,8 @@ Button {
 				if(!OpenWeatherMapApi.isUriValid())
 				{
 					errorUserFeedback.updateText("Please provide valid country code and zip code.", "red")
-					zip_code.text = ""
-					country_code.text = ""
+					current_weather_input_layout.zip_code = ""
+					current_weather_input_layout.country_code = ""
 				}
 				else
 				{
@@ -27,8 +32,8 @@ Button {
 						errorUserFeedback.updateText(OpenWeatherMapApi.responseStatusInfo(), "red")
 						if(responseStatus == 404)
 						{
-							zip_code.text = ""
-							country_code.text = ""
+							current_weather_input_layout.zip_code = ""
+							current_weather_input_layout.country_code = ""
 						}
 					}
 					else
@@ -50,6 +55,7 @@ Button {
 
 	onClicked: {
 		//OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
-		OpenWeatherMapApi.getData(zip_code.text, country_code.text)
+		OpenWeatherMapApi.getData(current_weather_input_layout.zip_code, 
+			current_weather_input_layout.country_code)
 	}
 }

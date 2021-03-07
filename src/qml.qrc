@@ -8,6 +8,9 @@
         <file>CurrentWeatherButton.qml</file>
         <file>ResetWeatherButton.qml</file>
         <file>RefreshWeatherButton.qml</file>
+        <file>CurrentLocationWeatherOutputLayout.qml</file>
         <file>CurrentWeatherOutputLayout.qml</file>
+        <file>CurrentWeatherInputLayout.qml</file>
+        <file>WeatherOutputLayout.qml</file>
     </qresource>
 </RCC>

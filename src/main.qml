@@ -46,34 +46,19 @@ ApplicationWindow {
 			id: weather_layout
 			columns: 1
 			visible: false
-			GridLayout {
-				id: weather_input_layout
-				columns: 2
+			CurrentWeatherInputLayout {
+				id: current_weather_input_layout
 
 				Connections {
 					target: current_weather_button
-					onWeatherUpdated: weather_input_layout.visible = false
-				}
-
-				GridLayout {
-					id: grid_text
-					columns: 1
-
-					TextField {
-						id: zip_code
-						placeholderText: qsTr("Enter zip code")
-					}
-
-					TextField {
-						id: country_code
-						placeholderText: qsTr("Enter country code")
-					}
+					onWeatherUpdated: current_weather_input_layout.visible = false
 				}
 
 				CurrentWeatherButton {
 					id: current_weather_button
 				}
 			}
+
 			TextArea {
 				id: errorUserFeedback
 				placeholderText: "error feedback"
@@ -89,13 +74,7 @@ ApplicationWindow {
 				}
 			}
 
-			CurrentWeatherOutputLayout {
-				id: current_weather_output_layout
-				Connections {
-					target: current_weather_button
-					onWeatherUpdated: current_weather_output_layout.updateCityAndTemperature()
-				}
-			}
+			CurrentWeatherOutputLayout {}
 		}
 
 		GridLayout
@@ -104,39 +83,8 @@ ApplicationWindow {
 			anchors.verticalCenterOffset: overlayHeader.height
 			id: current_location_layout
 			columns: 1
-			visible: true
-
-			ColumnLayout {
-				id: current_location_weather_output_layout
-				visible: true
-				RowLayout {
-					Label {
-						text: "City:"
-					}
-					TextArea {
-						id: current_location_cityName
-						placeholderText: "CityName, CoutryCode"
-					}
-				}
-				RowLayout {
-					Label {
-						text: "Temperature:"
-					}
-					TextArea {
-						id: current_location_temperature
-						placeholderText: "Temperature in Celsius"
-					}
-				}
-
-				Connections {
-					target: OpenWeatherMapApi
-					onFetchDataFinished : {
-						current_location_cityName.text = OpenWeatherMapApi.cityName(true)
-						current_location_temperature.text = OpenWeatherMapApi.temperature(TemperatureType.Average,
-								TemperatureScale.Celsius)
-					}
-				}
-			}		
+			visible: true	
+			CurrentLocationWeatherOutputLayout {}	
 		}
 	}
 }
