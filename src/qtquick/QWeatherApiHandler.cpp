@@ -59,25 +59,25 @@ Q_INVOKABLE void QWeatherApiHandler::getData(const QGeoCoordinate& coords)
 Q_INVOKABLE int QWeatherApiHandler::responseStatusCode()
 {
 	assert(dataObj_ != nullptr);
-	return dataObj_->responseStatusCodeQ();
+	return dataObj_->responseStatusCode();
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusInfo()
 {
 	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->responseStatusInfoQ());
+	return QString::fromStdString(dataObj_->responseStatusInfo());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusUserFeedback()
 {
 	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->responseStatusUserFeedbackQ());
+	return QString::fromStdString(dataObj_->responseStatusUserFeedback());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::cityName(bool withCountryCode)
 {
 	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->cityNameQ(withCountryCode));
+	return QString::fromStdString(dataObj_->cityName(withCountryCode));
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int temperatureScale)
@@ -89,7 +89,7 @@ Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int tem
 QString QWeatherApiHandler::temperature(TemperatureType type, TemperatureScale scale)
 {
 	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->temperatureQ(type, scale)) 
+	return QString::fromStdString(dataObj_->temperature(type, scale)) 
 		+ temperature_scale::temperatureUnit(scale);
 }
 

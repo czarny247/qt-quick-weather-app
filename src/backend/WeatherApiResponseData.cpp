@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <optional>
 #include <string>
 #include <cmath>
 
@@ -26,6 +27,34 @@ std::string userFeedback(HttpStatus::Code code)
 	}
 }
 
+bool isTemperatureAvailable(const QJsonObject& obj)
+{
+	if(!obj.contains("main"))
+	{
+		return false;
+	}
+	else
+	{
+		auto mainObj = obj["main"].toObject();
+
+		if(!mainObj.contains("temp")
+			|| !mainObj.contains("temp_max")
+			|| !mainObj.contains("temp_min")
+			|| !mainObj.contains("feels_like"))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::optional<double> extractTemperature(const QJsonObject& obj, const std::string& tempKey)
+{
+	return obj[tempKey.c_str()].isDouble() 
+		? std::optional<double>(obj[tempKey.c_str()].toDouble())
+		: std::nullopt;
+}
 
 }
 
@@ -33,47 +62,46 @@ namespace backend
 {
 
 WeatherApiResponseData::WeatherApiResponseData(QJsonObject& weatherApiResponseBody)
-: weatherApiResponseBodyQ_(weatherApiResponseBody)
+: weatherApiResponseBody_(weatherApiResponseBody)
 {
 }
 
-unsigned int WeatherApiResponseData::responseStatusCodeQ()
+unsigned int WeatherApiResponseData::responseStatusCode()
 {
 	int result {0};
 
-	auto it = weatherApiResponseBodyQ_.find("cod");
-	if(it != weatherApiResponseBodyQ_.end())
+	auto it = weatherApiResponseBody_.find("cod");
+	if(it != weatherApiResponseBody_.end())
 	{
 		result = it->toInt();
 	}
-	printf("WeatherApiResponseData::responseStatusCodeQ:%u\n", result);
 	return result;
 }
 
-std::string WeatherApiResponseData::responseStatusInfoQ()
+std::string WeatherApiResponseData::responseStatusInfo()
 {
-	int code = responseStatusCodeQ();
+	int code = responseStatusCode();
 	std::string reasonPhrase = HttpStatus::reasonPhrase(code);
 	return {std::to_string(code) + ": " + reasonPhrase + ". " 
 		+ userFeedback(static_cast<HttpStatus::Code>(code))};
 }
 
-std::string WeatherApiResponseData::responseStatusUserFeedbackQ()
+std::string WeatherApiResponseData::responseStatusUserFeedback()
 {
-	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCodeQ()))};
+	return {userFeedback(static_cast<HttpStatus::Code>(responseStatusCode()))};
 }
 
-std::string WeatherApiResponseData::cityNameQ(bool withCountryCode)
+std::string WeatherApiResponseData::cityName(bool withCountryCode)
 {
 	std::string result {"-"};
 
-	auto it = weatherApiResponseBodyQ_.find("name");
-	if(it != weatherApiResponseBodyQ_.end())
+	auto it = weatherApiResponseBody_.find("name");
+	if(it != weatherApiResponseBody_.end())
 	{
 		result = it->toString().toStdString();
 
-		it = weatherApiResponseBodyQ_.find("country");
-		if(it != weatherApiResponseBodyQ_.end())
+		it = weatherApiResponseBody_.find("country");
+		if(it != weatherApiResponseBody_.end())
 		{
 			result.append(", ").append(it->toString().toStdString());
 		}
@@ -81,29 +109,33 @@ std::string WeatherApiResponseData::cityNameQ(bool withCountryCode)
 	return result;
 }
 
-std::string WeatherApiResponseData::temperatureQ(TemperatureType type, TemperatureScale scale)
+std::string WeatherApiResponseData::temperature(TemperatureType type, TemperatureScale scale)
 {
 	std::string result {"-"};
-	//todo check if response contains those fields
-	double temperature = 
-		[](const auto& obj, TemperatureType type) -> double
+
+	if (!isTemperatureAvailable(weatherApiResponseBody_))
+	{
+		return result;
+	}
+
+	std::optional<double> maybeTemperature = 
+		[this](const auto& obj, TemperatureType type) -> std::optional<double>
 		{
 			switch(type)
 			{
 			case TemperatureType::Average:
-				return obj["main"]["temp"].toDouble();
+				return extractTemperature(obj, "temp");
 			case TemperatureType::Max:
-				return obj["main"]["temp_max"].toDouble();
+				return extractTemperature(obj, "temp_max");
 			case TemperatureType::Min:
-				return obj["main"]["temp_min"].toDouble();
+				return extractTemperature(obj, "temp_min");
 			case TemperatureType::FeelsLike:
-				return obj["main"]["feels_like"].toDouble();
+				return extractTemperature(obj, "feels_like");
 			default:
-				return 0.0; //?
+				return std::nullopt;
 			}
-		}(weatherApiResponseBodyQ_, type);
 
-	printf("WeatherApiResponseData::temperatureQ:%f\n", temperature);
+		}(weatherApiResponseBody_["main"].toObject(), type);
 
 	auto convertTempByScale =
 		[](double temperature, TemperatureScale scale) -> double
@@ -111,7 +143,7 @@ std::string WeatherApiResponseData::temperatureQ(TemperatureType type, Temperatu
 			switch(scale)
 			{
 			case TemperatureScale::Kelvin:
-				return temperature; //because api provides temperature in Kelvins
+				return temperature;
 			case TemperatureScale::Celsius:
 			{
 				static constexpr double celsiusOffset {273.15};
@@ -128,8 +160,12 @@ std::string WeatherApiResponseData::temperatureQ(TemperatureType type, Temperatu
 				return temperature;
 			}
 		};
-	
-	result = std::to_string(static_cast<int>(std::round(convertTempByScale(temperature, scale))));
+
+	if(maybeTemperature.has_value())
+	{
+		return std::to_string(static_cast<int>(
+			std::round(convertTempByScale(maybeTemperature.value(), scale))));
+	}
 
 	return result;
 }

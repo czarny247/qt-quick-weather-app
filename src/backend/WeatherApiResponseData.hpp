@@ -20,14 +20,14 @@ public:
 	WeatherApiResponseData(const WeatherApiResponseData&) = default;
 	WeatherApiResponseData& operator=(const WeatherApiResponseData&) = default;
 
-	unsigned int responseStatusCodeQ();
-	std::string responseStatusInfoQ();
-	std::string responseStatusUserFeedbackQ();
-	std::string cityNameQ(bool withCountryCode);
-	std::string temperatureQ(TemperatureType type, TemperatureScale scale);
+	unsigned int responseStatusCode();
+	std::string responseStatusInfo();
+	std::string responseStatusUserFeedback();
+	std::string cityName(bool withCountryCode);
+	std::string temperature(TemperatureType type, TemperatureScale scale);
 
 private:
-	QJsonObject weatherApiResponseBodyQ_;
+	QJsonObject weatherApiResponseBody_;
 
 };
 

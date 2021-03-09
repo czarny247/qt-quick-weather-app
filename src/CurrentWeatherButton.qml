@@ -38,14 +38,6 @@ Button {
 					}
 					else
 					{
-						// current_weather_output_layout.cityName.text = OpenWeatherMapApi.cityName(true)
-						// current_weather_output_layout.temperature.text = OpenWeatherMapApi.temperature(
-						// 	TemperatureType.Average, 
-						// 	TemperatureScale.Celsius)
-						// errorUserFeedback.visible = false
-						// weather_input_layout.visible = false
-						// current_weather_output_layout.visible = false
-						// current_weather_output_layout.visible = true
 						weatherUpdated()
 					}
 				}
@@ -54,7 +46,6 @@ Button {
 	}
 
 	onClicked: {
-		//OpenWeatherMapApi.fetchData(zip_code.text, country_code.text)
 		OpenWeatherMapApi.getData(current_weather_input_layout.zip_code, 
 			current_weather_input_layout.country_code)
 	}
