@@ -40,12 +40,14 @@ public:
 	Q_INVOKABLE QString temperature(int temperatureType, int temperatureScale);
 	Q_INVOKABLE bool isUriValid();
 
+	//move to another class
+	Q_INVOKABLE bool isDebug();
+
 	void fetchDataFinishedCallback();
 
 private:
 	std::shared_ptr<backend::WeatherApiHandler> weatherApiHandler_ {nullptr};
 	std::unique_ptr<backend::WeatherApiResponseData> data_ {nullptr};
-	std::unique_ptr<backend::WeatherApiResponseData> dataObj_ {nullptr};
 
 	//workaround - see: https://bugreports.qt.io/browse/QTBUG-19741
 	QString temperature(TemperatureType type, TemperatureScale scale);

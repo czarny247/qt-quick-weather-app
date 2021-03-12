@@ -15,16 +15,24 @@
 #include <cassert>
 #include <utility>
 
+#include "backend/BuildType.hpp"
+
 namespace qtquick
 {
 
 void QWeatherApiHandler::dataFetched(QNetworkReply* reply)
 {
 	QString strReply = (QString)reply->readAll();
-    qDebug() << "Response:" << strReply;
+    
+    //todo: make logger class
+    if(isDebug())
+    {
+    	qDebug() << "Response:" << strReply;
+    }
+
     QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
 	QJsonObject jsonObj = jsonResponse.object();
-	dataObj_.reset(new backend::WeatherApiResponseData(jsonObj));
+	data_.reset(new backend::WeatherApiResponseData(jsonObj));
 	this->fetchDataFinishedCallback();
 }
 
@@ -58,26 +66,26 @@ Q_INVOKABLE void QWeatherApiHandler::getData(const QGeoCoordinate& coords)
 
 Q_INVOKABLE int QWeatherApiHandler::responseStatusCode()
 {
-	assert(dataObj_ != nullptr);
-	return dataObj_->responseStatusCode();
+	assert(data_ != nullptr);
+	return data_->responseStatusCode();
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusInfo()
 {
-	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->responseStatusInfo());
+	assert(data_ != nullptr);
+	return QString::fromStdString(data_->responseStatusInfo());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::responseStatusUserFeedback()
 {
-	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->responseStatusUserFeedback());
+	assert(data_ != nullptr);
+	return QString::fromStdString(data_->responseStatusUserFeedback());
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::cityName(bool withCountryCode)
 {
-	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->cityName(withCountryCode));
+	assert(data_ != nullptr);
+	return QString::fromStdString(data_->cityName(withCountryCode));
 }
 
 Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int temperatureScale)
@@ -88,14 +96,19 @@ Q_INVOKABLE QString QWeatherApiHandler::temperature(int temperatureType, int tem
 
 QString QWeatherApiHandler::temperature(TemperatureType type, TemperatureScale scale)
 {
-	assert(dataObj_ != nullptr);
-	return QString::fromStdString(dataObj_->temperature(type, scale)) 
+	assert(data_ != nullptr);
+	return QString::fromStdString(data_->temperature(type, scale)) 
 		+ temperature_scale::temperatureUnit(scale);
 }
 
 Q_INVOKABLE bool QWeatherApiHandler::isUriValid()
 {
 	return weatherApiHandler_->isUriValid();
+}
+
+Q_INVOKABLE bool QWeatherApiHandler::isDebug()
+{
+	return getBuildType() == "Debug";
 }
 
 void QWeatherApiHandler::fetchDataFinishedCallback()

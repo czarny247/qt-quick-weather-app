@@ -4,7 +4,7 @@ import Qt.WeatherApiHandler 1.0
 
 PositionSource {
     id: src
-    updateInterval: 60000
+    updateInterval: 60000 //miliseconds
     active: true
     preferredPositioningMethods: PositionSource.AllPositioningMethods
 
@@ -22,7 +22,11 @@ PositionSource {
             supPos = "NonSatellitePositioningMethods"
         }
        	
-       	console.log("Position Source Loaded || Supported: "+supPos+" Valid: "+valid);
+        //todo: make logger class
+        if(OpenWeatherMapApi.isDebug())
+        {
+            console.log("Position Source Loaded || Supported: "+supPos+" Valid: "+valid);
+        }
         OpenWeatherMapApi.getData(src.position.coordinate)
     }
 

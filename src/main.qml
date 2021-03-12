@@ -59,19 +59,8 @@ ApplicationWindow {
 				}
 			}
 
-			TextArea {
+			ErrorUserFeedbackTextArea {
 				id: errorUserFeedback
-				placeholderText: "error feedback"
-				function updateText(text, color)
-				{
-					errorUserFeedback.text = text
-					errorUserFeedback.color = color
-				}
-
-				Connections {
-					target: current_weather_button
-					onWeatherUpdated: errorUserFeedback.visible = false
-				}
 			}
 
 			CurrentWeatherOutputLayout {}

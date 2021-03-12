@@ -12,5 +12,6 @@
         <file>CurrentWeatherOutputLayout.qml</file>
         <file>CurrentWeatherInputLayout.qml</file>
         <file>WeatherOutputLayout.qml</file>
+        <file>ErrorUserFeedbackTextArea.qml</file>
     </qresource>
 </RCC>

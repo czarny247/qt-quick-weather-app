@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(qt-quick-weather-app)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -24,7 +22,15 @@ else()
 	#todo get api key from jsonfile - prepare json template
 endif()
 
-find_package(cpprestsdk REQUIRED)
+if(CMAKE_BUILD_TYPE STREQUAL "")
+	message(WARNING "No CMAKE_BUILD_TYPE specified. Setting it to Debug")
+	set(CMAKE_BUILD_TYPE "Debug")
+elseif(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release"))
+	message(FATAL_ERROR "CMAKE_BUILD_TYPE should be Debug or Release. Current: ${CMAKE_BUILD_TYPE}")
+endif()
+
+configure_file(src/backend/BuildType.hpp.in src/backend/BuildType.hpp)
+
 find_package(Qt5 REQUIRED 
 	Qml
 	Quick
@@ -34,8 +40,6 @@ find_package(Qt5 REQUIRED
 	Network)
 find_package(Qt5QuickCompiler)
 qt5_add_resources(qml_QRC src/qml.qrc)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/src
 	${PROJECT_BINARY_DIR}/src)
@@ -53,6 +57,7 @@ set(SOURCE
 	src/qtquick/QWeatherApiHandler.cpp
 	src/3party/HttpStatusCodes_C++11.h
 	${PROJECT_BINARY_DIR}/src/backend/ApiKey.hpp
+	${PROJECT_BINARY_DIR}/src/backend/BuildType.hpp
 )
 
 set(PRIVATE_LINK_LIBRARIES
